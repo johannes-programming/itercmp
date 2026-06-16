@@ -161,7 +161,7 @@ class TestDunderLe(unittest.TestCase):
                 return NotImplemented
 
         yield (A(),), (B(),)
-        
+
     def go(self: Self, c:Any, x:Any, y:Any, /) -> tuple[Any, Any]:
         try:
             return c(x, y), None
@@ -186,6 +186,7 @@ class TestDunderLe(unittest.TestCase):
             self.gen_007,
             self.gen_008,
             self.gen_009,
+            self.gen_010,
             self.gen_900,
         ]
         for gen in gens:
@@ -196,6 +197,6 @@ class TestDunderLe(unittest.TestCase):
                     ans_old, exc_old = self.go(t.__le__, x_, y_)
                     ans_new, exc_new = self.go(itercmp.dunder.le, x_, y_)
                     self.assertEqual(ans_old, ans_new)
-                    self.assertEqual(exc_old, exc_new)
+                    self.assertEqual(repr(exc_old), repr(exc_new))
                     self.assertEqual(str(exc_old), str(exc_new))
                     self.assertIs(type(exc_old), type(exc_new))
