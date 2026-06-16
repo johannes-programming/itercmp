@@ -129,20 +129,6 @@ class TestDunderLe(unittest.TestCase):
         yield (1, nan), (1, nan)                        # same obj after equal prefix
         yield (1, float("nan")), (1, float("nan"))      # distinct after equal prefix
 
-    def gen_900(self: Self) -> Generator[tuple[Any, Any], None, None]:
-        class A:
-            def __eq__(self: Self, other: object, /) -> Any:
-                return False
-
-            def __le__(self: Self, other: object, /) -> Any:
-                return 42
-
-        class B:
-            def __eq__(self: Self, other: object, /) -> Any:
-                return False
-
-        yield (A(),), (B(),)
-
     def gen_010(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Both directions NotImplemented -> a <= b raises TypeError; the
         # container __le__ must propagate it identically.
@@ -159,6 +145,74 @@ class TestDunderLe(unittest.TestCase):
 
             def __ge__(self: Self, other: object, /) -> Any:
                 return NotImplemented
+
+        yield (A(),), (B(),)
+
+    def gen_900(self: Self) -> Generator[tuple[Any, Any], None, None]:
+        class A:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return False
+
+            def __le__(self: Self, other: object, /) -> Any:
+                return 42
+
+        class B:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return False
+
+        yield (A(),), (B(),)
+
+    def gen_901(self: Self) -> Generator[tuple[Any, Any], None, None]:
+        class A:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return NotImplemented
+
+            def __le__(self: Self, other: object, /) -> Any:
+                return True
+
+        class B:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return True
+
+        yield (A(),), (B(),)
+    def gen_902(self: Self) -> Generator[tuple[Any, Any], None, None]:
+        class A:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return NotImplemented
+
+            def __le__(self: Self, other: object, /) -> Any:
+                return True
+
+        class B:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return False
+
+        yield (A(),), (B(),)
+
+    def gen_903(self: Self) -> Generator[tuple[Any, Any], None, None]:
+        class A:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return NotImplemented
+
+            def __le__(self: Self, other: object, /) -> Any:
+                return False
+
+        class B:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return True
+
+        yield (A(),), (B(),)
+    def gen_904(self: Self) -> Generator[tuple[Any, Any], None, None]:
+        class A:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return NotImplemented
+
+            def __le__(self: Self, other: object, /) -> Any:
+                return False
+
+        class B:
+            def __eq__(self: Self, other: object, /) -> Any:
+                return False
 
         yield (A(),), (B(),)
 
@@ -188,6 +242,10 @@ class TestDunderLe(unittest.TestCase):
             self.gen_009,
             self.gen_010,
             self.gen_900,
+            self.gen_901,
+            self.gen_902,
+            self.gen_903,
+            self.gen_904,
         ]
         for gen in gens:
             for x, y in gen():
