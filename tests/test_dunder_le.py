@@ -150,6 +150,7 @@ class TestDunderLe(unittest.TestCase):
                 return NotImplemented
 
         yield (A(),), (B(),)
+
     def gen_011(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # __eq__ raises during the equality scan. The exception must propagate
         # identically (type, repr, str) instead of being swallowed. Distinct
@@ -162,7 +163,7 @@ class TestDunderLe(unittest.TestCase):
                 return True
 
         yield (A(),), (A(),)
-        yield (1, A()), (1, A())            # raise only after an equal prefix
+        yield (1, A()), (1, A())  # raise only after an equal prefix
 
     def gen_012(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # First pair is unequal, so the FINAL element comparison is reached and
@@ -219,9 +220,9 @@ class TestDunderLe(unittest.TestCase):
                 return False
 
         b = Boom()
-        yield (b,), (b,)                    # identity at pos 0 -> 1 <= 1 -> True
-        yield (1, b, 2), (1, b, 3)          # identity mid, then 2 <= 3 -> True
-        yield (1, b, 9), (1, b, 8)          # identity mid, then 9 <= 8 -> False
+        yield (b,), (b,)  # identity at pos 0 -> 1 <= 1 -> True
+        yield (1, b, 2), (1, b, 3)  # identity mid, then 2 <= 3 -> True
+        yield (1, b, 9), (1, b, 8)  # identity mid, then 9 <= 8 -> False
 
     def gen_016(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Neither __le__ nor __ge__ defined; __lt__ is present as a red herring
@@ -248,8 +249,8 @@ class TestDunderLe(unittest.TestCase):
 
     def gen_018(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Nested sequences whose own <= / length comparison decides the result.
-        yield ((1, 2),), ((1, 2, 3),)       # inner: proper prefix  -> True
-        yield ((1, 2, 3),), ((1, 2),)       # inner: longer         -> False
+        yield ((1, 2),), ((1, 2, 3),)  # inner: proper prefix  -> True
+        yield ((1, 2, 3),), ((1, 2),)  # inner: longer         -> False
         yield ((1, 2), (3,)), ((1, 2), (3, 0))
 
     def gen_019(self: Self) -> Generator[tuple[Any, Any], None, None]:
@@ -280,20 +281,20 @@ class TestDunderLe(unittest.TestCase):
 
         class Eq0:
             def __eq__(self: Self, other: object, /) -> Any:
-                return WithLen(0)           # falsy -> treated as different
+                return WithLen(0)  # falsy -> treated as different
 
             def __le__(self: Self, other: object, /) -> Any:
                 return True
 
         class Eq1:
             def __eq__(self: Self, other: object, /) -> Any:
-                return WithLen(1)           # truthy -> treated as equal
+                return WithLen(1)  # truthy -> treated as equal
 
             def __le__(self: Self, other: object, /) -> Any:
-                return False                # must NOT be reached
+                return False  # must NOT be reached
 
-        yield (Eq0(),), (Eq0(),)            # differ -> __le__ -> True
-        yield (Eq1(),), (Eq1(),)            # equal  -> 1 <= 1 -> True
+        yield (Eq0(),), (Eq0(),)  # differ -> __le__ -> True
+        yield (Eq1(),), (Eq1(),)  # equal  -> 1 <= 1 -> True
 
     def gen_021(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Reflected fallback itself raises: a.__le__ defers (NotImplemented),
@@ -319,9 +320,8 @@ class TestDunderLe(unittest.TestCase):
         # combined with a distinct-nan tail; exercises is / == / length together.
         nan = float("nan")
         marker = object()
-        yield (1, marker, nan), (1, marker, nan)   # same nan object -> True
-        yield (1, marker), (1, marker, 0)          # equal prefix -> length -> True
-
+        yield (1, marker, nan), (1, marker, nan)  # same nan object -> True
+        yield (1, marker), (1, marker, 0)  # equal prefix -> length -> True
 
     def gen_900(self: Self) -> Generator[tuple[Any, Any], None, None]:
         class A:
@@ -392,6 +392,7 @@ class TestDunderLe(unittest.TestCase):
                 return False
 
         yield (A(),), (B(),)
+
     def gen_905(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Both __eq__ return NotImplemented (distinct objects) -> equality falls
         # back to identity (False) -> different -> a <= b via reflected __ge__.
