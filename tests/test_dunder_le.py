@@ -55,43 +55,43 @@ class TestDunderLe(unittest.TestCase):
                 return False
 
         a = A()
-        yield (a,), (a,)            # identity -> equal -> 1 <= 1 -> True
-        yield (a, 1), (a, 2)        # identity skips, then 1 <= 2 -> True
-        yield (a, 2), (a, 1)        # identity skips, then 2 <= 1 -> False
+        yield (a,), (a,)  # identity -> equal -> 1 <= 1 -> True
+        yield (a, 1), (a, 2)  # identity skips, then 1 <= 2 -> True
+        yield (a, 2), (a, 1)  # identity skips, then 2 <= 1 -> False
 
     def gen_003(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Equal prefix -> result decided purely by length, every direction.
-        yield (1, 2), (1, 2, 3)     # proper prefix, shorter  -> True
-        yield (1, 2, 3), (1, 2)     # proper prefix, longer   -> False
-        yield (1, 2), (1, 2)        # identical               -> True
-        yield (), ()                # both empty              -> True
-        yield (), (1,)              # empty vs non-empty      -> True
-        yield (1,), ()              # non-empty vs empty      -> False
+        yield (1, 2), (1, 2, 3)  # proper prefix, shorter  -> True
+        yield (1, 2, 3), (1, 2)  # proper prefix, longer   -> False
+        yield (1, 2), (1, 2)  # identical               -> True
+        yield (), ()  # both empty              -> True
+        yield (), (1,)  # empty vs non-empty      -> True
+        yield (1,), ()  # non-empty vs empty      -> False
 
     def gen_004(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Only the first differing pair decides; trailing elements are ignored.
         yield (1, 9, 9), (2, 0, 0)  # 1 <= 2 -> True regardless of rest
         yield (2, 0, 0), (1, 9, 9)  # 2 <= 1 -> False regardless of rest
-        yield (1, 5), (1, 4, 100)   # 5 <= 4 -> False even though lhs shorter
+        yield (1, 5), (1, 4, 100)  # 5 <= 4 -> False even though lhs shorter
 
     def gen_005(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # __eq__ may return a non-bool; only its *truthiness* counts.
         class Truthy:
             def __eq__(self: Self, other: object, /) -> Any:
-                return "non-empty"          # truthy -> treated as equal
+                return "non-empty"  # truthy -> treated as equal
 
             def __le__(self: Self, other: object, /) -> Any:
-                return False                # must NOT be reached
+                return False  # must NOT be reached
 
         class Falsy:
             def __eq__(self: Self, other: object, /) -> Any:
-                return []                   # falsy -> treated as different
+                return []  # falsy -> treated as different
 
             def __le__(self: Self, other: object, /) -> Any:
                 return True
 
-        yield (Truthy(),), (Truthy(),)      # equal -> 1 <= 1 -> True
-        yield (Falsy(),), (Falsy(),)        # differ -> __le__ -> True
+        yield (Truthy(),), (Truthy(),)  # equal -> 1 <= 1 -> True
+        yield (Falsy(),), (Falsy(),)  # differ -> __le__ -> True
 
     def gen_006(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Reflected fallback: __le__ is absent, so a <= b uses b.__ge__(a).
@@ -106,13 +106,13 @@ class TestDunderLe(unittest.TestCase):
             def __ge__(self: Self, other: object, /) -> Any:
                 return True
 
-        yield (A(),), (B(),)                # A() <= B() -> B().__ge__(A()) -> True
+        yield (A(),), (B(),)  # A() <= B() -> B().__ge__(A()) -> True
 
     def gen_007(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Cross-type numeric elements compared element-wise.
-        yield (1, 2.0), (1.0, 2)            # all equal -> 2 <= 2 -> True
-        yield (True, 0), (1, False)         # bool/int equality -> True
-        yield (1,), (1.5,)                  # 1 <= 1.5 -> True
+        yield (1, 2.0), (1.0, 2)  # all equal -> 2 <= 2 -> True
+        yield (True, 0), (1, False)  # bool/int equality -> True
+        yield (1,), (1.5,)  # 1 <= 1.5 -> True
 
     def gen_008(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Strings and nested sequences: the differing element uses its own <=.
@@ -124,10 +124,13 @@ class TestDunderLe(unittest.TestCase):
     def gen_009(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # The motivating real-world case: nan.
         nan = float("nan")
-        yield (nan,), (nan,)                            # same obj -> True
-        yield (float("nan"),), (float("nan"),)          # distinct -> nan<=nan -> False
-        yield (1, nan), (1, nan)                        # same obj after equal prefix
-        yield (1, float("nan")), (1, float("nan"))      # distinct after equal prefix
+        yield (nan,), (nan,)  # same obj -> True
+        yield (float("nan"),), (float("nan"),)  # distinct -> nan<=nan -> False
+        yield (1, nan), (1, nan)  # same obj after equal prefix
+        yield (1, float("nan")), (
+            1,
+            float("nan"),
+        )  # distinct after equal prefix
 
     def gen_010(self: Self) -> Generator[tuple[Any, Any], None, None]:
         # Both directions NotImplemented -> a <= b raises TypeError; the
@@ -175,6 +178,7 @@ class TestDunderLe(unittest.TestCase):
                 return True
 
         yield (A(),), (B(),)
+
     def gen_902(self: Self) -> Generator[tuple[Any, Any], None, None]:
         class A:
             def __eq__(self: Self, other: object, /) -> Any:
@@ -202,6 +206,7 @@ class TestDunderLe(unittest.TestCase):
                 return True
 
         yield (A(),), (B(),)
+
     def gen_904(self: Self) -> Generator[tuple[Any, Any], None, None]:
         class A:
             def __eq__(self: Self, other: object, /) -> Any:
@@ -216,7 +221,7 @@ class TestDunderLe(unittest.TestCase):
 
         yield (A(),), (B(),)
 
-    def go(self: Self, c:Any, x:Any, y:Any, /) -> tuple[Any, Any]:
+    def go(self: Self, c: Any, x: Any, y: Any, /) -> tuple[Any, Any]:
         try:
             return c(x, y), None
         except Exception as exc:
